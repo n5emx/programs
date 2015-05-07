@@ -89,7 +89,7 @@ goto end
 
 set /a str="rand=%random% %% 200"
 echo IP is 10.10.10.%str%
-echo msgbox("10.10.10.%str%" ,0, "IP Address") > c:\ip.vbs
+echo x = msgbox("10.10.10.%str%" ,0, "IP Address") > c:\ip.vbs
 echo.%str%
 
 
