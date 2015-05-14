@@ -63,7 +63,6 @@ goto end
 echo ______________
 echo %IP4%
 echo %Mask%
-echo %GW%
 netsh interface ipv4 set address "Local Area Connection" static %IP4% %Mask%
 netsh interface set interface "Local Area Connection" DISABLED 
 netsh interface set interface "Local Area Connection" ENABLED
