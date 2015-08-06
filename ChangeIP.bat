@@ -1,15 +1,15 @@
 @echo Off
-color 1F
 :start
-echo This works best if you hard code the following into your LAN
-echo DNS settings. Option 2 will not reset your DNS settings  
+color 1F
+cls
+echo. 
+echo. 
 echo                 DNS 1: 10.104.76.23   Windstream Private
 echo                 DNS 2: 166.102.165.11 Windstream Public
 echo                 DNS 3: 8.8.8.8        Google Public
 echo.
-echo   DNS 1 will fail if you are connecting to a customers WAN connection for 
-echo   testing, the next server is public and should work, if all else fails 
-echo   the Google server will catch it if you have access to the Internet
+echo.
+echo.
 echo               ___________________________________________________________
 echo              ^|                                                          ^|
 echo              ^| 1.   Change IP Address                                   ^|
@@ -18,12 +18,11 @@ echo              ^| 2.   Reset IP to DHCP                                    ^|
 echo              ^|                                                          ^|
 echo              ^| 3.   Release / Renew IP                                  ^|
 echo              ^|                                                          ^|
-echo              ^| 4.   Same as #1, but no prompts, allows disabling of LAN ^|
-echo              ^|         computer will have an IP of 10.10.10.xx          ^|
+echo              ^| 4.   Disable Wired LAN / Program random IP               ^|
 echo              ^|                                                          ^|
-echo              ^| 5.   Program Static DNS                                  ^|
+echo              ^| 5.   Config for MetroNID                                          ^|
 echo              ^|                                                          ^|
-echo              ^| 6.   Get DNS from DHCP                                   ^|
+echo              ^| 6.   Help!                                               ^|
 echo              ^|                                                          ^|
 echo              ^| 7.   Quit                                                ^|
 echo              ^|                                                          ^|
@@ -36,7 +35,7 @@ if /i {%MenuCmd%}=={2} (goto :command2)
 if /i {%MenuCmd%}=={3} (goto :command3)
 if /i {%MenuCmd%}=={4} (goto :command4)
 if /i {%MenuCmd%}=={5} (goto :command5)
-if /i {%MenuCmd%}=={6} (goto :command6)
+if /i {%MenuCmd%}=={6} (goto :commandH)
 if /i {%MenuCmd%}=={7} (goto :command7)
 
 
@@ -61,7 +60,7 @@ echo %GW%
 netsh interface ipv4 set address "Local Area Connection" static %IP4% %Mask% %GW%
 netsh interface set interface "Local Area Connection" DISABLED 
 netsh interface set interface "Local Area Connection" ENABLED
-goto start
+goto command5
 
 :nogw
 
@@ -71,7 +70,7 @@ echo %Mask%
 netsh interface ipv4 set address "Local Area Connection" static %IP4% %Mask%
 netsh interface set interface "Local Area Connection" DISABLED 
 netsh interface set interface "Local Area Connection" ENABLED
-goto start
+goto command5
 
 
 :command1
@@ -79,13 +78,14 @@ goto jump
 
 :command2
 netsh interface ipv4 set address "Local Area Connection" source=dhcp
-
+REM ipconfig /release > null
+ipconfig /flushdns
+ipconfig /renew > null
+goto command6
 
 :command3
 ipconfig /release
-echo.
 ipconfig /renew
-echo.
 goto start
 
 :command4
@@ -98,7 +98,7 @@ echo.%str%
 
 
 call c:\windows\system32\wscript.exe c:\ip.vbs
-pause
+
 
 netsh interface ipv4 set address "Local Area Connection" static 10.10.10.%str% 255.255.255.0
 netsh interface set interface "Local Area Connection" DISABLED 
@@ -106,17 +106,22 @@ netsh interface set interface "Local Area Connection" ENABLED
 goto start
 
 :command5
-netsh interface ip set dns name="Local Area Connection" static 10.104.76.24
-netsh interface ip add dns name="Local Area Connection" 166.102.165.11 index=2
-netsh interface ip add dns name="Local Area Connection" 8.8.8.8 index=3
+netsh interface ipv4 set address "Local Area Connection" static 192.168.1.250 255.255.255.0
+netsh interface set interface "Local Area Connection" DISABLED 
+netsh interface set interface "Local Area Connection" ENABLED
 goto start
 
 
 :command6
 netsh interface ip set dnsservers name="Local Area Connection" source=dhcp
+goto start
 
-
-
+:commandH
+cls
+color F1
+type ChangeIP_help.txt
+pause
+goto start
 
 :command7
 goto end
