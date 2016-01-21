@@ -3,14 +3,12 @@ import os.path
 #   RJ45-A_SFP-B
 #InputFileName = input("Enter filename of tech support dump file:  ")
 InputRtrName = input("Router Hostname: ")
+InputSN = input("Router Serial Number: ")
 InputMgmntIP = input("Enter IP of Management:  ")
 InputSM = input("Enter Subnet Mask bits 28,29 or 30:  ")
 InputVL = input("Enter Management VLAN:  ")
-print ("Description Example:  Joes Pizza | IP/LVXX/001122/WCI")
-InputDesc = input("Enter Customer Name | Circuit ID")
-
-#print("                   C. RJ45-A to RJ45-B")
-#InputConnType = input("Enter Connection Type: [C]")
+print ("Description Example:  Joes Pizza | IP/LVXX/001122/WCI" + '\n')
+InputDesc = input("Enter Customer Name | Circuit ID:  ")
 
 OutputFile = "c:\\configs\\CiscoMgmt.cfg"
 
@@ -19,8 +17,8 @@ string = ""
 MgmntIP = ""
 ConnType = ""
 DescGE01 = ""
-RtrName = ""
-SerialNum = ""
+RtrName = InputRtrName
+SerialNum = InputSN
 
 #if(InputConnType == "a"):
 #    ConnType = "SFP-A_RJ45-B"
@@ -56,6 +54,15 @@ print (MgmntIP)
 print (MgmntGW)
 print (OutputFile)
 
+
+StringLength = len(RtrName) + len(SerialNum) + 8 
+if(StringLength > 44):
+    PadLength = 0
+else: PadLength = 45 - StringLength
+print (StringLength)
+Pad = " " * PadLength
+print(PadLength)
+print(Pad)
 
 text_file = open(OutputFile, "w")
 
@@ -187,7 +194,10 @@ text_file.write("banner login ^" + '\n')
 text_file.write("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" + '\n')
 text_file.write("$$ Windstream                                 $$" + '\n')
 text_file.write("$$ Internet Services                          $$" + '\n')
-text_file.write("$$ " + RtrName + "    S/N" + SerialNum  +    "$$" + '\n')
+
+text_file.write("$$ " + RtrName + "  S/N " + SerialNum  + Pad +"$$" + '\n')
+#SRRRRRRRRRRRRRRRRSSSSS/NSNNNNNNNNNNNNNNSPPPPPPPP
+
 text_file.write("$$ UNAUTHORIZED ACCESS IS PROHIBITED          $$" + '\n')
 text_file.write("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" + '\n')
 text_file.write("^" + '\n')

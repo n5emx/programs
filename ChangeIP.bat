@@ -7,7 +7,7 @@ echo.
 echo                 DNS 1: 10.104.76.23   Windstream Private
 echo                 DNS 2: 166.102.165.11 Windstream Public
 echo                 DNS 3: 8.8.8.8        Google Public
-echo.
+echo                 rev 5
 echo.
 echo.
 echo               ___________________________________________________________
@@ -20,11 +20,13 @@ echo              ^| 3.   Release / Renew IP                                  ^|
 echo              ^|                                                          ^|
 echo              ^| 4.   Disable Wired LAN / Program random IP               ^|
 echo              ^|                                                          ^|
-echo              ^| 5.   Config for MetroNID                                          ^|
+echo              ^| 5.   Config for MetroNID                                 ^|
 echo              ^|                                                          ^|
-echo              ^| 6.   Help!                                               ^|
+echo              ^| 6.   Swap                                                ^|
 echo              ^|                                                          ^|
-echo              ^| 7.   Quit                                                ^|
+echo              ^| 7.   Help!                                               ^|
+echo              ^|                                                          ^|
+echo              ^| 8.   Quit                                                ^|
 echo              ^|                                                          ^|
 echo              ^|_________________________________________________________ ^|
 
@@ -35,9 +37,9 @@ if /i {%MenuCmd%}=={2} (goto :command2)
 if /i {%MenuCmd%}=={3} (goto :command3)
 if /i {%MenuCmd%}=={4} (goto :command4)
 if /i {%MenuCmd%}=={5} (goto :command5)
-if /i {%MenuCmd%}=={6} (goto :commandH)
-if /i {%MenuCmd%}=={7} (goto :command7)
-
+if /i {%MenuCmd%}=={6} (goto :commandS)
+if /i {%MenuCmd%}=={7} (goto :commandH)
+if /i {%MenuCmd%}=={8} (goto :commandQ)
 
 
 :jump
@@ -48,7 +50,8 @@ goto printMaskMenu
 
 :jumpbak
 
-
+echo %IP4%
+echo %Mask%
 
 set /p GW=Enter Gateway(0 for none):
 if /i {%GW%}=={0} (goto :nogw)
@@ -58,9 +61,11 @@ echo %IP4%
 echo %Mask%
 echo %GW%
 netsh interface ipv4 set address "Local Area Connection" static %IP4% %Mask% %GW%
+netsh interface ip set dnsservers "Local Area Connection" static 8.8.8.8 primary
 netsh interface set interface "Local Area Connection" DISABLED 
 netsh interface set interface "Local Area Connection" ENABLED
-goto command5
+echo %IP4% %Mask% %GW% > C:\CLECPrograms\ip.txt
+goto start
 
 :nogw
 
@@ -68,9 +73,11 @@ echo ______________
 echo %IP4%
 echo %Mask%
 netsh interface ipv4 set address "Local Area Connection" static %IP4% %Mask%
+netsh interface ip set dnsservers "Local Area Connection" static 8.8.8.8 primary
 netsh interface set interface "Local Area Connection" DISABLED 
 netsh interface set interface "Local Area Connection" ENABLED
-goto command5
+echo %IP4% %Mask% %GW% > C:\CLECPrograms\ip.txt
+goto start
 
 
 :command1
@@ -123,11 +130,21 @@ type ChangeIP_help.txt
 pause
 goto start
 
-:command7
+:commandQ
 goto end
 
 
+:commandS
+IF NOT EXIST C:\CLECPrograms\ip.txt
+goto commandH
 
+for /f "delims=" %%x in (C:\CLECPrograms\ip.txt) do set IPstr=%%x
+echo %IPstr%
+pause
+
+
+
+goto start
 
 
 
@@ -220,4 +237,5 @@ if /i {%MenuMask%}=={c} (goto :slash32)
 
 
 :end
+del C:\CLECPrograms\ip.txt
 color 0F
